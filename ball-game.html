@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Bouncing Ball Game</title>
+    <meta charset="UTF-8">
+    <center>
+        <br/>
+        <div id="score" class="score"></div>
+        <br/>
+        <canvas id="myCanvas" width="500px" height="500px" style="border:1px solid #cc7832 " class="canvas"></canvas>
+    </center>
+    <style>
+        .canvas {
+            background-color: skyblue;
+        }
+
+        .score {
+            color: saddlebrown;
+            font-family: "Trebuchet MS";
+            font-size: large;
+        }
+    </style>
+</head>
+<body>
+<script>
+    var dx = 1;
+    var dy = 1;
+    var rightPressed = false;
+    var leftPressed = false;
+    var speed = 0.1;
+    var score = 0;
+
+    function keyDown(e) {
+        if (e.keyCode == 39) {
+            rightPressed = true;
+        }
+        if (e.keyCode == 37) {
+            leftPressed = true;
+        }
+    }
+
+    function keyUp(e) {
+        if (e.keyCode == 39) {
+            rightPressed = false;
+        }
+        if (e.keyCode == 37) {
+            leftPressed = false;
+        }
+    }
+
+    document.addEventListener("keydown", keyDown, false);
+    document.addEventListener("keyup", keyUp, false);
+
+    var Ball = function (x, y, r) {
+        this.x = x;
+        this.y = y;
+        this.r = r;
+
+        this.drawBall = function () {
+
+            var c = document.getElementById("myCanvas");
+            var ctx = c.getContext("2d");
+            ctx.clearRect(0, 0, c.width, c.height);
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+            ctx.fillStyle = "#0000FF";
+            ctx.fill();
+            this.x += dx;
+            this.y += dy;
+        }
+    };
+    var Bar = function (x1, y1, width1, height1) {
+        this.x1 = x1;
+        this.y1 = y1;
+        this.width1 = width1;
+        this.height1 = height1;
+
+        this.drawBar = function () {
+            var cR = document.getElementById("myCanvas");
+            var ctx1 = cR.getContext("2d");
+            ctx1.beginPath();
+            ctx1.rect(this.x1, this.y1, this.width1, this.height1);
+            ctx1.fillStyle = "#FF0000";
+            ctx1.fill();
+            ctx1.closePath();
+
+            if (rightPressed && this.x1 < 500 - this.width1) {
+                this.x1 += 5;
+            }
+            else if (leftPressed && this.x1 > 0) {
+                this.x1 -= 5;
+            }
+        }
+    };
+
+    var myBall = new Ball(250, 300, 10);
+    var myBar = new Bar(300, 400, 90, 15);
+
+    function move() {
+        myBall.drawBall();
+        myBar.drawBar();
+
+        if (myBall.x > 500 - myBall.r || myBall.x < myBall.r) {
+            dx = -dx
+        }
+        if (myBall.y + dy < myBall.r) {
+            dy = -dy;
+        }
+        else if (myBall.y > 500 - myBall.r) {
+            clearInterval(game);
+            alert("Trò chơi kết thúc. " + "Bạn đã đạt " + score + " điểm");
+            if (confirm("Bạn có muốn chơi tiếp") == true) {
+                document.location.reload();
+            } else {
+                alert("Cảm ơn bạn đã chơi.");
+            }
+        }
+
+        if (myBall.y + myBall.r === myBar.y1) {
+            if (myBall.x > myBar.x1 && myBall.x < myBar.x1 + myBar.width1) {
+                dy = -dy;
+                speed--;
+                score++;
+                if (score === 10) {
+                    clearInterval(game);
+                    alert("Chúc mừng bạn đã dành chiến thắng.");
+                    if (confirm("Bạn có muốn chơi tiếp") == true) {
+                        document.location.reload();
+                    } else {
+                        alert("Cảm ơn bạn đã chơi.");
+                    }
+                }
+            }
+        }
+        document.getElementById("score").innerHTML = "Bạn đang ở level " + score + "."
+    }
+
+    let game = setInterval(move, speed);
+
+
+</script>
+</body>
+</html>
